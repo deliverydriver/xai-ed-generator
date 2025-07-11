@@ -1,0 +1,111 @@
+import os
+import json
+import datetime
+from elevenlabs.client import ElevenLabs
+from educational_content_generator import EducationalContentGenerator
+from image_generator import ImageGenerator
+from audio_generator import AudioGenerator
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUTPUT_DIR = os.path.join(PROJECT_ROOT, "output")
+LOG_FILE = os.path.join(OUTPUT_DIR, "request_log.jsonl")
+
+def log_request(action, params, result_path=None):
+    log_entry = {
+        "timestamp": datetime.datetime.now().isoformat(),
+        "action": action,
+        "params": params,
+        "result_path": result_path
+    }
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(log_entry) + "\n")
+
+def build_prompt(topic, style, custom_style, age_group):
+    style_part = style
+    if style == "Agentic" and custom_style:
+        style_part += f" ({custom_style})"
+    prompt = (
+        f"Generate {style_part} educational content for the topic '{topic}' "
+        f"targeted at {age_group}."
+    )
+    return prompt
+
+def generate_content(topic, style, custom_style, age_group):
+    prompt = build_prompt(topic, style, custom_style, age_group)
+    content_generator = EducationalContentGenerator(prompt)
+    educational_content = content_generator.generate_content()
+    os.makedirs(os.path.join(OUTPUT_DIR, "content"), exist_ok=True)
+    content_file_path = os.path.join(OUTPUT_DIR, "content", f"{topic.replace(' ', '_')}_content.txt")
+    with open(content_file_path, "w", encoding="utf-8") as content_file:
+        content_file.write(educational_content)
+    log_request(
+        "generate_content",
+        {"topic": topic, "style": style, "custom_style": custom_style, "age_group": age_group, "prompt": prompt},
+        content_file_path
+    )
+    return educational_content, content_file_path
+
+def generate_image(educational_content, topic, style, custom_style, age_group):
+    os.makedirs(os.path.join(OUTPUT_DIR, "images"), exist_ok=True)
+    image_generator = ImageGenerator()
+    image_path = image_generator.generate_image(educational_content, topic)
+    log_request(
+        "generate_image",
+        {"topic": topic, "style": style, "custom_style": custom_style, "age_group": age_group, "educational_content": educational_content[:100] + "..."},
+        image_path
+    )
+    return image_path
+
+def generate_audio(educational_content, topic, style, custom_style, age_group, voice_id="FFj9mArDv2wVzs5iXpea"):
+    os.makedirs(os.path.join(OUTPUT_DIR, "audio"), exist_ok=True)
+    ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "sk_d6ee856407d3dfb8eeb374a0681b4f3b794cbd7a0252f03f")
+    elevenlabs_client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
+    audio_generator = AudioGenerator(elevenlabs_client)
+    audio_path = audio_generator.text_to_speech(educational_content, topic, voice_id)
+    log_request(
+        "generate_audio",
+        {"topic": topic, "style": style, "custom_style": custom_style, "age_group": age_group, "voice_id": voice_id, "educational_content": educational_content[:100] + "..."},
+        audio_path
+    )
+    return audio_path
+
+def generate_video(educational_content, topic, style, custom_style, age_group, callback=None):
+    from runway import generate_video as runway_generate_video
+    os.makedirs(os.path.join(OUTPUT_DIR, "video"), exist_ok=True)
+    video_path = os.path.join(OUTPUT_DIR, "video", f"{topic.replace(' ', '_')}_video.mp4")
+    prompt = f"Educational video: {educational_content[:200]}"
+    runway_generate_video(prompt, video_path, topic, callback=callback)
+    log_request(
+        "generate_video",
+        {
+            "topic": topic,
+            "style": style,
+            "custom_style": custom_style,
+            "age_group": age_group,
+            "prompt": prompt
+        },
+        video_path
+    )
+    return video_path
+
+def main():
+    topic = input("Enter the educational topic: ")
+    style = input("Enter the style (e.g., 'Agentic'): ")
+    custom_style = input("Enter custom style (optional): ")
+    age_group = input("Enter the target age group: ")
+
+    educational_content, content_file_path = generate_content(topic, style, custom_style, age_group)
+    print(f"Educational content saved to: {content_file_path}")
+
+    image_path = generate_image(educational_content, topic, style, custom_style, age_group)
+    print(f"Image generated and saved to: {image_path}")
+
+    audio_path = generate_audio(educational_content, topic, style, custom_style, age_group)
+    print(f"Audio generated and saved to: {audio_path}")
+
+    video_path = generate_video(educational_content, topic, style, custom_style, age_group)
+    print(f"Video generated and saved to: {video_path}")
+
+if __name__ == "__main__":
+    main()
