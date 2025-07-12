@@ -6,44 +6,31 @@ The xAI Educational Generator is a Python application designed to create educati
 ## xai-educational-gen 
 ├── src 
 │   
-├── main.py                        
-# Entry point for CLI and backend logic 
+├── main.py                        # Entry point for CLI and backend logic 
 │   
-├── gui.py                         
-# Tkinter-based graphical user interface 
+├── gui.py                         # Tkinter-based graphical user interface 
 │   
-├── educational_content_generator.py
-# EducationalContentGenerator class 
+├── educational_content_generator.py # EducationalContentGenerator class 
 │   
-├── image_generator.py              
-# ImageGenerator class for visuals 
+├── image_generator.py              # ImageGenerator class for visuals 
 │   
-├── audio_generator.py              
-# AudioGenerator class using ElevenLabs API 
+├── audio_generator.py              # AudioGenerator class using ElevenLabs API 
 │   
-├── runway.py                      
-# Video generation integration 
+├── runway.py                      # Video generation integration 
 │   
-├── admin_log_viewer.py             
-# Admin log viewer utility 
+├── admin_log_viewer.py             # Admin log viewer utility 
 │   
-├── voices.json                     
-# Voice definitions for audio generation 
+├── voices.json                     # Voice definitions for audio generation 
 │   
 └── output 
 │       
-├── content                     
-# Generated educational content text files 
+├── content                     # Generated educational content text files 
 │       
-├── images                     
-# Generated images 
+├── images                     # Generated images 
 │       
-└── audio                       
-# Generated audio files 
-├── requirements.txt                    
-# Project dependencies 
-├── .env.example                        
-# Template for environment variables (API keys, etc.) 
+└── audio                       # Generated audio files 
+├── requirements.txt                    # Project dependencies 
+├── .env.example                        # Template for environment variables (API keys, etc.) 
 └── README.md
 
 # Project documentation for the project
