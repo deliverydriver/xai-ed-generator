@@ -5,11 +5,21 @@ from tkinter import messagebox, ttk
 from PIL import Image, ImageTk
 import subprocess
 import sys
-
+import json
 import main
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUTPUT_DIR = os.path.join(PROJECT_ROOT, "output")
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+OUTPUT_DIR = os.path.join(os.path.dirname(PROJECT_ROOT), "output")
+VOICES_PATH = os.path.join(PROJECT_ROOT, "voices.json")
+
+# Load voices from voices.json
+try:
+    with open(VOICES_PATH, "r", encoding="utf-8") as f:
+        VOICES = json.load(f)
+except Exception:
+    VOICES = []
+VOICE_NAMES = [v["name"] for v in VOICES]
+VOICE_ID_MAP = {v["name"]: v["voice_id"] for v in VOICES}
 
 AGE_GROUPS = ["Kids", "Teens", "Adults"]
 
@@ -43,6 +53,14 @@ class EduGenApp:
         self.age_var = tk.StringVar(value=AGE_GROUPS[0])
         for idx, age in enumerate(AGE_GROUPS):
             tk.Radiobutton(age_frame, text=age, variable=self.age_var, value=age).grid(row=0, column=1+idx, padx=5)
+
+        # Voice selection dropdown
+        voice_frame = tk.Frame(root)
+        voice_frame.pack(pady=5)
+        tk.Label(voice_frame, text="Voice:", font=("Arial", 11)).grid(row=0, column=0, sticky="w")
+        self.voice_var = tk.StringVar(value=VOICE_NAMES[0] if VOICES else "")
+        self.voice_combo = ttk.Combobox(voice_frame, textvariable=self.voice_var, values=VOICE_NAMES, state="readonly", width=30)
+        self.voice_combo.grid(row=0, column=1, padx=5)
 
         self.status = tk.StringVar()
         self.status.set("Ready.")
@@ -79,10 +97,15 @@ class EduGenApp:
         style = self.style_var.get()
         custom_style = self.custom_style_entry.get().strip() if style == "Agentic" else ""
         age_group = self.age_var.get()
+        voice_name = self.voice_var.get()
+        voice_id = VOICE_ID_MAP.get(voice_name, "")
         if not topic:
             messagebox.showerror("Input Error", "Please enter a topic.")
             return None
-        return topic, style, custom_style, age_group
+        if not voice_id:
+            messagebox.showerror("Input Error", "Please select a valid voice.")
+            return None
+        return topic, style, custom_style, age_group, voice_id
 
     def start_generation(self):
         inputs = self.get_inputs()
@@ -90,7 +113,7 @@ class EduGenApp:
             return
         threading.Thread(target=self.generate_all, args=inputs, daemon=True).start()
 
-    def generate_all(self, topic, style, custom_style, age_group):
+    def generate_all(self, topic, style, custom_style, age_group, voice_id):
         self.progress["value"] = 0
         self.status.set("Generating content...")
         content, content_path = main.generate_content(topic, style, custom_style, age_group)
@@ -105,13 +128,13 @@ class EduGenApp:
         self.status.set("Image generated.")
 
         self.status.set("Generating audio...")
-        audio_path = main.generate_audio(content, topic, style, custom_style, age_group)
+        audio_path = main.generate_audio(content, topic, style, custom_style, age_group, voice_id)
         self.session_files.append(audio_path)
         self.progress["value"] = 3
         self.status.set("Audio generated.")
 
         self.status.set("Generating video (this may take a while)...")
-        video_path = main.generate_video(content, topic, style, custom_style, age_group, callback=self.update_video_progress)
+        video_path = main.generate_video(content, topic, style, custom_style, age_group, voice_id, callback=self.update_video_progress)
         self.session_files.append(video_path)
         self.progress["value"] = 4
         self.status.set("All files generated!")
@@ -207,14 +230,14 @@ class EduGenApp:
             return
         threading.Thread(target=self.generate_video_only, args=inputs, daemon=True).start()
 
-    def generate_content_only(self, topic, style, custom_style, age_group):
+    def generate_content_only(self, topic, style, custom_style, age_group, voice_id):
         self.status.set("Generating content...")
         content, content_path = main.generate_content(topic, style, custom_style, age_group)
         self.session_files.append(content_path)
         self.status.set("Content generated.")
         self.show_file_list()
 
-    def generate_image_only(self, topic, style, custom_style, age_group):
+    def generate_image_only(self, topic, style, custom_style, age_group, voice_id):
         self.status.set("Generating image...")
         content_file_path = os.path.join(OUTPUT_DIR, "content", f"{topic.replace(' ', '_')}_content.txt")
         if os.path.exists(content_file_path):
@@ -227,20 +250,24 @@ class EduGenApp:
         self.status.set("Image generated.")
         self.show_file_list()
 
-    def generate_audio_only(self, topic, style, custom_style, age_group):
-        self.status.set("Generating audio...")
-        content_file_path = os.path.join(OUTPUT_DIR, "content", f"{topic.replace(' ', '_')}_content.txt")
-        if os.path.exists(content_file_path):
-            with open(content_file_path, "r", encoding="utf-8") as f:
-                content = f.read()
-        else:
-            content = topic
-        audio_path = main.generate_audio(content, topic, style, custom_style, age_group)
-        self.session_files.append(audio_path)
-        self.status.set("Audio generated.")
-        self.show_file_list()
+    def generate_audio_only(self, topic, style, custom_style, age_group, voice_id):
+        try:
+            self.status.set("Generating audio...")
+            content_file_path = os.path.join(OUTPUT_DIR, "content", f"{topic.replace(' ', '_')}_content.txt")
+            if os.path.exists(content_file_path):
+                with open(content_file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+            else:
+                content = topic
+            audio_path = main.generate_audio(content, topic, style, custom_style, age_group, voice_id)
+            self.session_files.append(audio_path)
+            self.status.set("Audio generated.")
+            self.show_file_list()
+        except Exception as e:
+            self.status.set("Audio generation failed.")
+            messagebox.showerror("Audio Generation Error", str(e))
 
-    def generate_video_only(self, topic, style, custom_style, age_group):
+    def generate_video_only(self, topic, style, custom_style, age_group, voice_id):
         self.status.set("Generating video (this may take a while)...")
         content_file_path = os.path.join(OUTPUT_DIR, "content", f"{topic.replace(' ', '_')}_content.txt")
         if os.path.exists(content_file_path):
@@ -248,7 +275,7 @@ class EduGenApp:
                 content = f.read()
         else:
             content = topic
-        video_path = main.generate_video(content, topic, style, custom_style, age_group, callback=self.update_video_progress)
+        video_path = main.generate_video(content, topic, style, custom_style, age_group, voice_id, callback=self.update_video_progress)
         self.session_files.append(video_path)
         self.status.set("Video generated.")
         self.show_file_list()

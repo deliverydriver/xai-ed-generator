@@ -6,7 +6,7 @@ class ImageGenerator:
     def __init__(self):
         self.xai_api_key = os.environ.get(
             "XAI_API_KEY",
-            "xai-KMRpmonf6OOd6fRmvmcBTNI3DcxuNC1nmLEUDFNQzWkcYNFuXRs1mE0YhMtYREBfKPOhsEeB9JJK6SLi"
+            "xai-I75ki0upCc5zp97LluoKAwrT0j8OXmQZZAUCnH9MnogEKlK8ctDoQeXPzsg63mEXNrQZAYpELKRN1qx5"
         )
         self.client = OpenAI(
             api_key=self.xai_api_key,

@@ -4,7 +4,7 @@ import requests
 class EducationalContentGenerator:
     def __init__(self, topic):
         self.topic = topic
-        self.xai_api_key = "xai-KMRpmonf6OOd6fRmvmcBTNI3DcxuNC1nmLEUDFNQzWkcYNFuXRs1mE0YhMtYREBfKPOhsEeB9JJK6SLi"  # Replace with actual API key
+        self.xai_api_key = "xai-I75ki0upCc5zp97LluoKAwrT0j8OXmQZZAUCnH9MnogEKlK8ctDoQeXPzsg63mEXNrQZAYpELKRN1qx5"  # Replace with actual API key
         self.base_url = "https://api.x.ai/v1/chat/completions"
 
     def generate_content(self):

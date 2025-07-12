@@ -1,27 +1,31 @@
 import os
+from dotenv import load_dotenv
+from elevenlabs.client import ElevenLabs
+
+load_dotenv()
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUTPUT_DIR = os.path.join(PROJECT_ROOT, "output")
 
 class AudioGenerator:
-    def __init__(self, elevenlabs_client):
-        self.client = elevenlabs_client
-        # Save audio in output/audio
-        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.output_dir = os.path.join(project_root, "output", "content")
-        os.makedirs(self.output_dir, exist_ok=True)
+    def __init__(self):
+        self.elevenlabs = ElevenLabs(
+            api_key=os.getenv("ELEVENLABS_API_KEY"),
+        )
 
-    def text_to_speech(self, text, topic, voice_id):
-        """Convert text to speech using ElevenLabs API and save as MP3"""
-        try:
-            audio_generator = self.client.text_to_speech.convert(
-                text=text,
-                voice_id=voice_id,
-                model_id="eleven_multilingual_v2",
-                output_format="mp3_44100_128",
-            )
-            audio_content = b''.join(chunk for chunk in audio_generator)
-            audio_file_path = os.path.join(self.output_dir, f"{topic.replace(' ', '_')}_audio.mp3")
-            with open(audio_file_path, "wb") as f:
-                f.write(audio_content)
-            return audio_file_path
-        except Exception as e:
-            print(f"Error creating audio file with ElevenLabs: {e}")
-            return False
+    def generate(self, content, topic, style, custom_style, age_group, voice_id, model_id="eleven_multilingual_v2", output_format="mp3_44100_128"):
+        audio = self.elevenlabs.text_to_speech.convert(
+            text=content,
+            voice_id=voice_id,
+            model_id=model_id,
+            output_format=output_format,
+        )
+
+        # Use the correct output directory
+        output_dir = os.path.join(OUTPUT_DIR, "audio")
+        os.makedirs(output_dir, exist_ok=True)
+        filename = f"{topic.replace(' ', '_')}_audio.mp3"
+        audio_path = os.path.join(output_dir, filename)
+        with open(audio_path, "wb") as f:
+            f.write(audio)
+        return audio_path
