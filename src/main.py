@@ -20,6 +20,15 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(message)s"
 )
 
+def init_output_dirs():
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    os.makedirs(os.path.join(OUTPUT_DIR, "content"), exist_ok=True)
+    os.makedirs(os.path.join(OUTPUT_DIR, "images"), exist_ok=True)
+    os.makedirs(os.path.join(OUTPUT_DIR, "audio"), exist_ok=True)
+    os.makedirs(os.path.join(OUTPUT_DIR, "video"), exist_ok=True)
+
+init_output_dirs()
+
 def log_request(action, params, result_path=None):
     log_entry = {
         "timestamp": datetime.datetime.now().isoformat(),
@@ -125,6 +134,7 @@ def generate_video(educational_content, topic, style, custom_style, age_group, v
 def main():
     logging.info("Starting main function")
     try:
+        init_output_dirs()
         topic = input("Enter the educational topic: ")
         style = input("Enter the style (e.g., 'Agentic'): ")
         custom_style = input("Enter custom style (optional): ")
