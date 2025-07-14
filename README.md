@@ -1,7 +1,7 @@
 # xAI Educational Generator
 
 ## Overview
-The xAI Educational Generator is a Python application designed to create educational content on any topic. It leverages the xAI API for text generation, ElevenLabs for lifelike speech synthesis, and can generate images and videos to provide a comprehensive, multi-format learning experience. The application includes both a command-line and graphical user interface (GUI).
+The xAI Educational Generator is a Python application designed to create educational content on any topic. It leverages the xAI API for text generation, ElevenLabs for lifelike speech synthesis, and can generate images and videos to provide a comprehensive, multi-format learning experience. The application includes both a command-line and graphical user interface (GUI). — also included is a monitoring application that when you open it, it is a list of all inputs and outputs that can be exported as a report
 
 ## xai-educational-gen 
 ├── src
