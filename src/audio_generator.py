@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from elevenlabs.client import ElevenLabs
 
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env"))
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, "output")
@@ -21,11 +21,11 @@ class AudioGenerator:
             output_format=output_format,
         )
 
-        # Use the correct output directory
         output_dir = os.path.join(OUTPUT_DIR, "audio")
         os.makedirs(output_dir, exist_ok=True)
         filename = f"{topic.replace(' ', '_')}_audio.mp3"
         audio_path = os.path.join(output_dir, filename)
         with open(audio_path, "wb") as f:
-            f.write(audio)
+            for chunk in audio:
+                f.write(chunk)
         return audio_path

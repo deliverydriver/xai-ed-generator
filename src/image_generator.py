@@ -6,7 +6,7 @@ class ImageGenerator:
     def __init__(self):
         self.xai_api_key = os.environ.get(
             "XAI_API_KEY",
-            "xai-I75ki0upCc5zp97LluoKAwrT0j8OXmQZZAUCnH9MnogEKlK8ctDoQeXPzsg63mEXNrQZAYpELKRN1qx5"
+            "***"
         )
         self.client = OpenAI(
             api_key=self.xai_api_key,
@@ -22,7 +22,7 @@ class ImageGenerator:
         try:
             # Get a brief scene description from the paragraph
             scene_response = self.client.chat.completions.create(
-                model="grok-2",
+                model="grok-3-mini",
                 messages=[
                     {"role": "system", "content": "Create a vivid visual description based on the following educational content. Make it suitable for image generation."},
                     {"role": "user", "content": paragraph_text}
@@ -34,7 +34,7 @@ class ImageGenerator:
 
             # Generate the image using the correct endpoint
             response = self.client.images.generate(
-                model="grok-2-image",
+                model="grok-3-mini-image",
                 prompt=f"Educational illustration: {scene_description}",
                 n=1,
                 response_format="b64_json"

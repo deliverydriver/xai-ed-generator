@@ -4,7 +4,7 @@ import time
 import base64
 import mimetypes
 
-RUNWAY_API_KEY = "key_8238c8edd2b9e276bc0171e90d44a7223e9b93ffcf3ecf3cabbe635a7db7ea03b6395c4cfd88d05e3015b3c872bfece7591051a8ad3fc5b3bdd5386bf6627faf"
+RUNWAY_API_KEY = "***"
 RUNWAY_API_URL = "https://api.dev.runwayml.com/v1/image_to_video"
 
 def read_content(content_path):

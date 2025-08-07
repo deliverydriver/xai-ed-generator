@@ -4,7 +4,7 @@ import requests
 class EducationalContentGenerator:
     def __init__(self, topic):
         self.topic = topic
-        self.xai_api_key = "xai-I75ki0upCc5zp97LluoKAwrT0j8OXmQZZAUCnH9MnogEKlK8ctDoQeXPzsg63mEXNrQZAYpELKRN1qx5"  # Replace with actual API key
+        self.xai_api_key = "***"  # Replace with actual API key
         self.base_url = "https://api.x.ai/v1/chat/completions"
 
     def generate_content(self):
@@ -17,7 +17,7 @@ class EducationalContentGenerator:
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": "grok-2",
+                    "model": "grok-3-mini",
                     "messages": [
                         {"role": "system", "content": "You are an educational content generator. Write a clear, engaging, and accurate explanation for the following topic."},
                         {"role": "user", "content": self.topic}
