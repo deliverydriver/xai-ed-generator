@@ -7,6 +7,7 @@ for business development use azures.accents.0z@icloud.com
 
 reach me on IG, FB, TG @goodfamilia
 
+<img src="https://raw.githubusercontent.com/deliverydriver/xai-ed-generator/refs/heads/master/output/images/Disney's_Rivers_of_America_8e5dff22.jpg" alt="Disney's Rivers of America" width="300" height="300">
 
 ## Overview
 The xAI Educational Generator is a Python application designed to create educational content on any topic. It leverages the xAI API for text generation, ElevenLabs for lifelike speech synthesis, and can generate images and videos to provide a comprehensive, multi-format learning experience. The application includes both a command-line and graphical user interface (GUI). — also included is a monitoring application that when you open it, it is a list of all inputs and outputs that can be exported as a report
