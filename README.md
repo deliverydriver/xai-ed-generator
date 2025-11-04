@@ -1,3 +1,5 @@
+![Screenshot](https://raw.githubusercontent.com/deliverydriver/xai-ed-generator/refs/heads/master/Screenshot%20from%202025-11-04%2013-27-46.png)
+
 # xAI Educational Generator
 
 for questions or help direct messages to allow.multi.0f@icloud.com
